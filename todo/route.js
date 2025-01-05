@@ -1,36 +1,16 @@
 const Router = require('express');
 const { getTodos, getTodoById, createTodo } = require('./services');
 const formatResponseAndSend = require('../utils/formatResponse');
+const { createListApiValidator, todoIdValidator } = require('./validators');
+const { validationResult } = require('express-validator');
+const handleValidation = require('../middlewares/handleValidation');
 
 const todoRouter = Router();
 
-// {
-//     message: "TODOs creating.",
-//     data: null,
-// }
-
-
-
 // GET LIST OF ALL TODOS
-todoRouter.get('/', (req, res) => {
-
-    let limit = 5;
-    let page = 1;
-
-    if (req.query.limit) {
-        limit = parseInt(req.query.limit);
-        if (isNaN(limit) || limit <= 0) {
-            formatResponseAndSend(res, null, null, new Error('Limit should be a positive integer'), 400);
-        }
-    }
-
-    if (req.query.page) {
-        page = parseInt(req.query.page);
-        if (isNaN(page)) {
-            formatResponseAndSend(res, null, null, new Error('Invalid page number'), 400);
-            return;
-        }
-    }
+todoRouter.get('/', createListApiValidator(), handleValidation, (req, res) => {
+    let limit = req.query.limit || 5;
+    let page = req.query.page || 1;
     try {
         const todos = getTodos(limit, page);
         formatResponseAndSend(res, 'TODOs fetched', todos);
@@ -42,12 +22,10 @@ todoRouter.get('/', (req, res) => {
 
 
 // GET TODO BY ITS ID
-todoRouter.get('/:id', (req, res) => {
-    const todoId = parseInt(req.params.id);
-    if (isNaN(todoId)) {
-        formatResponseAndSend(res, null, null, new Error('Invalid todo id'), 400);
-        return;
-    }
+todoRouter.get('/:id', todoIdValidator(), handleValidation, (req, res) => {
+
+    const todoId = req.params.id;
+
     try {
         const todo = getTodoById(todoId);
         if (todo) {
@@ -76,7 +54,7 @@ todoRouter.post('/', (req, res) => {
 
 // UPDATE A TODO
 todoRouter.put('/:id', (req, res) => {
-
+    res.status(501).statusMessage('Method not implemented')
 });
 
 
