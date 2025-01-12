@@ -1,53 +1,45 @@
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
+const Todo = require('./todo.model');
 
-const readTodosFromFile = () => {
-    const todos = fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8');
-    return JSON.parse(todos ?? '[]');
+// const readTodosFromFile = () => {
+//     const todos = fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8');
+//     return JSON.parse(todos ?? '[]');
+// }
+
+
+const getTodos = (limit, page, user) => {
+    try {
+        const offset = (page - 1) * limit;
+        const todos = Todo.find({
+            createdBy: user.id,
+        }, null, { limit: limit, skip: offset });
+        return todos;
+    } catch (err) {
+        console.error(err);
+    }
+
 }
 
-
-const getTodos = (limit, page) => {
-    const todos = readTodosFromFile();
-
-    const offset = (page - 1) * limit;
-
-    console.log(offset, limit, offset + limit)
-
-    return todos.slice(offset, offset + limit);
-
-}
-
-const getTodoById = (id) => {
+const getTodoById = async (id) => {
     // read all the todos
-    const todos = readTodosFromFile();
+    try {
+        const todo = await Todo.findById(id);
+        return todo;
+    } catch (err) {
+        console.error(err);
+    }
 
-    // find the todo using find method by its ID
-    return todos.find(todo => todo.id === id);
 }
 
 
-const createTodo = (todo) => {
-    // read all the todos
-    const todos = readTodosFromFile();
-
-    // find the max id from the todos
-    const maxId = todos.reduce((max, todo) => {
-        return todo.id > max ? todo.id : max;
-    }, 0);
-
-    // assign the next id to the new todo
-    todo.id = maxId + 1;
-
-    todo.completed = false;
-
-    // add the new todo to the list
-    todos.push(todo);
-
-    // write the updated list to the file
-    fs.writeFileSync(path.join(__dirname, 'data.json'), JSON.stringify(todos, null, 2));
-
-    // return the newly created todo
+const createTodo = async (todoData, user) => {
+    const todo = new Todo({
+        title: todoData.title,
+        description: todoData.description,
+        createdBy: user.id,
+    });
+    await todo.save();
     return todo;
 }
 

@@ -10,8 +10,8 @@ const createListApiValidator = () => [
 
 
 const todoIdValidator = () => param('id')
-    .isInt({ min: 1 })
-    .withMessage('Todo Id must be present and should be a valid positive integer')
+    .isMongoId()
+    .withMessage('Todo Id must be present and should be valid')
 
 
 
