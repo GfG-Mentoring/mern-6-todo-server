@@ -1,5 +1,5 @@
 const express = require('express');
-const fs = require('fs');
+const cors = require('cors');
 const todoRouter = require('./todo/route');
 const authRouter = require('./auth/routes');
 
@@ -11,7 +11,7 @@ require('dotenv').config()
 
 const server = express();
 
-
+server.use(cors());
 server.use(express.json()) // for parsing application/json
 
 server.get('/', (req, res) => {
