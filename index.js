@@ -6,6 +6,7 @@ const authRouter = require('./auth/routes');
 const validateUser = require('./middlewares/validateUser');
 const { connectToDb } = require('./utils/db');
 const userRouter = require('./users/user.route');
+const { fileRouter } = require('./file/routes');
 
 require('dotenv').config()
 
@@ -22,6 +23,7 @@ server.get('/', (req, res) => {
 server.use('/auth', authRouter);
 server.use('/user', userRouter);
 server.use('/todo', validateUser, todoRouter);
+server.use('/file', fileRouter);
 
 
 server.listen(3000, async () => {
